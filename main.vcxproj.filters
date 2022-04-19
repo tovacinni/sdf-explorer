@@ -1,0 +1,273 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ResourceCompile Include="resources.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{e022396f-0616-4d65-bb46-4497a9a24891}</UniqueIdentifier>
+      <Extensions>*.cpp</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{7808eb57-c0e1-4947-8248-1127238ea26e}</UniqueIdentifier>
+      <Extensions>*.h</Extensions>
+    </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{562523b7-dfa2-4cfa-acae-1ad7ade219dd}</UniqueIdentifier>
+      <Extensions>*.vrt;*.geo;*.pix</Extensions>
+    </Filter>
+    <Filter Include="Scene Files">
+      <UniqueIdentifier>{f7819c7b-69f2-4778-bec8-4dbee2bfa711}</UniqueIdentifier>
+      <Extensions>*.any</Extensions>
+    </Filter>
+    <Filter Include="Sampler Files">
+      <UniqueIdentifier>{62c262cc-084e-4584-95c7-96ee07eee9f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDF Files">
+      <UniqueIdentifier>{1d4eded9-820a-4bd2-8bb3-393742b5478d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="App.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="App.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data-files\shader\common.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="data-files\scene\camera.Scene.Any">
+      <Filter>Scene Files</Filter>
+    </None>
+    <None Include="data-files\shader\App\App_visualize.pix">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="data-files\shader\App\App_raycast.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Triprismbound.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Cube.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Dodecahedron.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Hexprism.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Icosahedron.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Fractal\Mandelbulb.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Fractal\Julia.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Vehicle\Cybertruck.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Misc\Dalek.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Nature\Mountain.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Nature\Mushroom.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Nature\Rock.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Nature\Tree.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Bezier.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\Cables.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Capsule.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\Castle.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\Chain.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Animal\Dinosaur.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Animal\Elephant.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Animal\Fish.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\Gear.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Animal\Girl.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\GrandPiano.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Helix.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Animal\Jellyfish.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\Knob.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Animal\MantaRay.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\Mech.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\Rooks.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Animal\Snail.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Animal\Snake.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\Teapot.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\Temple.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Triangle.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Fractal\Menger.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Fractal\Serpinski.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Cone.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Cylinder.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Tetrahedron.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Pyramid.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Animal\PixarMike.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\Key.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Vehicle\Lamborghini.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Vehicle\TieFighter.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Animal\Tardigrade.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Misc\Cheese.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Animal\HumanHead.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Misc\Burger.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\Mobius.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\Vase.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Test\teapot.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Test\Temp.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Animal\HumanSkull.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\UprightPiano.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Vehicle\Jetfighter.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Vehicle\Oldcar.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Manufactured\Spike.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Vehicle\Boat.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Octabound.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Octahedron.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Roundbox.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Sphere.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Torus.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sdf\Geometry\Trefoil.glsl">
+      <Filter>SDF Files</Filter>
+    </None>
+    <None Include="data-files\sampler\near.glsl">
+      <Filter>Sampler Files</Filter>
+    </None>
+    <None Include="data-files\sampler\rand.glsl">
+      <Filter>Sampler Files</Filter>
+    </None>
+    <None Include="data-files\sampler\surface.glsl">
+      <Filter>Sampler Files</Filter>
+    </None>
+    <None Include="data-files\sampler\grid.glsl">
+      <Filter>Sampler Files</Filter>
+    </None>
+    <None Include="data-files\sampler\image.glsl">
+      <Filter>Sampler Files</Filter>
+    </None>
+    <None Include="data-files\sampler\jitter.glsl">
+      <Filter>Sampler Files</Filter>
+    </None>
+    <None Include="data-files\sampler\metropolis.glsl">
+      <Filter>Sampler Files</Filter>
+    </None>
+    <None Include="data-files\sampler\metropolis_curvature.glsl">
+      <Filter>Sampler Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>
