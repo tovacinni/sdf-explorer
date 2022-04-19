@@ -1,4 +1,4 @@
-# A Dataset and Explorer for 3D Signed Distance Functions
+## A Dataset and Explorer for 3D Signed Distance Functions
 
 This is the official code repository for our JCGT paper: 
 
