@@ -7,6 +7,8 @@ This is the official code repository for our JCGT paper:
 [Towaki Takikawa](https://tovacinni.github.io), [Andrew Glassner](https://www.glassner.com), 
 [Morgan McGuire](https://casual-effects.com)
 
+<img src="media/demo.jpg" alt="drawing" height="400"/>
+
 ## Downloading the Dataset
 
 Our dataset is available as `.npz` files for download [here](https://drive.google.com/file/d/1StTkilQSk83lj60VaqcMHh3GT73CSIKT/view?usp=sharing) 
