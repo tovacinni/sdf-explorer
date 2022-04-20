@@ -112,7 +112,7 @@ include: %(defaultinclude)s
 
 library: %(defaultlibrary)s
 
-exclude: %(defaultexclude)s$eval("|^docker")|sdfdes|temp
+exclude: %(defaultexclude)s$eval("|^docker")|sdfdes|media|temp
 
 workdir: data-files
 
