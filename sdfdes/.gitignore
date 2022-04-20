@@ -1,7 +1,0 @@
-build
-dist
-sdfdes.egg-info
-*.so
-*.polyscope.ini
-imgui.ini
-__pycache__
