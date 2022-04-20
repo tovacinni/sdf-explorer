@@ -170,10 +170,6 @@ void App::onInit() {
         Array<String> normalArray;
         FileSystem::getFiles(FilePath::concat(s, "*_Normal.*"), normalArray, true);
         m_normalArray.append(normalArray);
-        
-        Array<String> roughnessArray;
-        FileSystem::getFiles(FilePath::concat(s, "*_Roughness.*"), roughnessArray, true);
-        m_roughnessArray.append(roughnessArray);
     }
     
     m_colorArray.sort();
@@ -200,7 +196,6 @@ void App::onInit() {
     m_activeColor = 0;
     m_activeDisplacement = 0;
     m_activeNormal = 0;
-    m_activeRoughness = 0;
     m_sample = false;
     m_whiteBg = true; // TODO: Fix name
     m_coloredPlane = true; 
@@ -392,7 +387,6 @@ void App::makeGUI() {
     pane->addDropDownList("Base Color", colorGuiArray, &m_activeColor, nullptr, true);
     pane->addDropDownList("Displacement", displacementGuiArray, &m_activeDisplacement, nullptr, true);
     pane->addDropDownList("Normal Map", normalGuiArray, &m_activeNormal, nullptr, true);
-    pane->addDropDownList("Roughness", roughnessGuiArray, &m_activeRoughness, nullptr, true);
     pane->addCheckBox("Ground Plane", &m_groundPlane);
     GuiSlider<float>* elevationSlider = pane->addSlider("Height", &m_groundPlaneHeight, -1.0f, 1.0f);
     elevationSlider->moveBy(tabSize, 0.0f);
