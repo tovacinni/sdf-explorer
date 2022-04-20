@@ -1,0 +1,483 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript">google.load("jquery", "1.3.2");</script>
+
+<style type="text/css">
+body {
+    font-family: "Titillium Web", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: 300;
+    font-size: 17px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 980px;
+}
+h1 {
+    font-weight:300;
+    line-height: 1.15em;
+}
+
+h2 {
+    font-size: 1.75em;
+}
+a:link,a:visited {
+    color: #1367a7;
+    text-decoration: none;
+}
+a:hover {
+    color: #208799;
+}
+h1, h2, h3 {
+    text-align: center;
+}
+h1 {
+    font-size: 36px;
+    font-weight: 500;
+}
+h2 {
+    font-weight: 400;
+    margin: 16px 0px 4px 0px;
+}
+.paper-title {
+    padding: 16px 0px 16px 0px;
+}
+section {
+    margin: 32px 0px 32px 0px;
+    text-align: justify;
+    clear: both;
+}
+.col-5 {
+     width: 20%;
+     float: left;
+}
+.col-4 {
+     width: 25%;
+     float: left;
+}
+.col-3 {
+     width: 33%;
+     float: left;
+}
+.col-2 {
+     width: 50%;
+     float: left;
+}
+.row, .author-row, .affil-row {
+     overflow: auto;
+}
+.author-row, .affil-row {
+    font-size: 20px;
+}
+.row {
+    margin: 16px 0px 16px 0px;
+}
+.authors {
+    font-size: 18px;
+}
+.affil-row {
+    margin-top: 16px;
+}
+.teaser {
+    max-width: 100%;
+}
+.text-center {
+    text-align: center;  
+}
+.screenshot {
+    width: 256px;
+    border: 1px solid #ddd;
+}
+.screenshot-el {
+    margin-bottom: 16px;
+}
+hr {
+    height: 1px;
+    border: 0; 
+    border-top: 1px solid #ddd;
+    margin: 0;
+}
+.material-icons {
+    vertical-align: -6px;
+}
+p {
+    line-height: 1.25em;
+}
+.image-center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.caption {
+    font-size: 16px;
+    /*font-style: italic;*/
+    color: #666;
+    text-align: center;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+video {
+    display: block;
+    margin: auto;
+}
+figure {
+    display: block;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+#bibtex pre {
+    font-size: 14px;
+    background-color: #eee;
+    padding: 16px;
+}
+.blue {
+    color: #2c82c9;
+    font-weight: bold;
+}
+.orange {
+    color: #d35400;
+    font-weight: bold;
+}
+.flex-row {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+.paper-btn {
+  position: relative;
+  text-align: center;
+
+  display: inline-block;
+  margin: 8px;
+  padding: 8px 8px;
+
+  border-width: 0;
+  outline: none;
+  border-radius: 2px;
+  
+  background-color: #1367a7;
+  color: #ecf0f1 !important;
+  font-size: 20px;
+  width: 100px;
+  font-weight: 600;
+}
+.paper-btn-parent {
+    display: flex;
+    justify-content: center;
+    margin: 16px 0px;
+}
+.paper-btn:hover {
+    opacity: 0.85;
+}
+.container {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+.venue {
+    color: #1367a7;
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: #EEEEEE;
+}
+
+.topnav a {
+  float: left;
+  color: black;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+</style>
+
+<div class="topnav" id="myTopnav">
+  <a href="https://www.nvidia.com/"><img width="100%" src="assets/nvidia.svg"></a>
+  <a href="https://www.nvidia.com/en-us/research/" ><strong>NVIDIA Research</strong></a>
+</div>
+
+<script type="text/javascript" src="../js/hidebib.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Titillium+Web:400,600,400italic,600italic,300,300italic' rel='stylesheet' type='text/css'>
+    <head>
+        <title>A Dataset and Explorer for 3D Signed Distance Functions</title>
+        <meta property="og:description" content="A Dataset and Explorer for 3D Signed Distance Functions"/>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@yongyuanxi">
+        <meta name="twitter:title" content="A Dataset and Explorer for 3D Signed Distance Functions">
+        <meta name="twitter:description" content="The signed distance function (SDF)
+is enjoying a renewed focus of research activity in
+computer graphics, but until now there has been no
+standard reference dataset of such functions. 
+We present
+a database of 63 curated, optimized, 
+and regularized functions of varying complexity.
+Our functions are provided as analytic
+expressions that can be 
+efficiently evaluated on a GPU at any
+point in space.
+We also present a viewing and inspection tool, and software
+for producing SDF samples appropriate for
+both traditional graphics and training neural networks.
+">
+        <meta name="twitter:image" content="https://tovacinni.github.io/sdf-explorer/assets/demo.jpg">
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZQPDND6RGM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-ZQPDND6RGM');
+</script>
+
+    </head>
+
+ <body>
+<div class="container">
+    <div class="paper-title">
+      <h1>A Dataset and Explorer for 3D Signed Distance Functions</h1>
+    </div>
+
+    <div id="authors">
+        <div class="author-row">
+            <div class="col-3 text-center"><a href="https://tovacinni.github.io">Towaki Takikawa</a><sup>1,2</sup></div>
+            <div class="col-3 text-center"><a href="https://www.glassner.com/">Andrew Glassner</a><sup>3</sup></div>
+            <div class="col-3 text-center"><a href="https://casual-effects.com/">Morgan McGuire</a><sup>2,4</sup></div>
+        </div>
+
+        <div class="affil-row">
+            <div class="col-4 text-center"><sup>1</sup>NVIDIA</a></div>
+            <div class="col-4 text-center"><sup>2</sup>University of Waterloo</div>
+            <div class="col-4 text-center"><sup>3</sup>Unity / Weta Digital</div>
+            <div class="col-4 text-center"><sup>4</sup>ROBLOX</div>
+        </div>
+        <div class="affil-row">
+            <div class="venue text-center"><b>Journal of Computer Graphics Techniques / i3D 2022</b></div>
+        </div>
+
+        <div style="clear: both">
+            <div class="paper-btn-parent">
+            <a class="paper-btn" href="https://jcgt.org/">
+                <span class="material-icons"> description </span> 
+                 Paper
+            </a>
+            <a class="paper-btn" href="https://github.com/tovacinni/sdf-explorer">
+                <span class="material-icons"> code </span> 
+                 Code
+            </a>
+            <a class="paper-btn" href="https://drive.google.com/file/d/1StTkilQSk83lj60VaqcMHh3GT73CSIKT/view">
+                <span class="material-icons"> interests </span> 
+                 Dataset
+            </a>
+        </div></div>
+    </div>
+
+    <section id="teaser">
+        <img width="100%" src="assets/demo.jpg">
+        <p class="caption">
+            We provide a dataset and an explorer to visualize, analyze and work with signed distance functions.
+        </p>
+    </section>
+
+    <section id="news">
+        <h2>News</h2>
+        <hr>
+        <div class="row">
+            <div><span class="material-icons"> event </span> [May 2022] We will be presenting at <a href="https://i3dsymposium.org/2022/">i3D 2022</a>!</div>
+            <div><span class="material-icons"> event </span> [April 2022] Our <a href="https://github.com/tovacinni/sdf-explorer">code</a> has been released.</div>
+        </div>
+    </section>
+
+    <section id="paper">
+        <h2>Paper</h2>
+        <hr>
+        <div class="flex-row">
+            <div style="box-sizing: border-box; padding: 16px; margin: auto;">
+                <a href="assets/nglod.pdf"><img class="screenshot" src="assets/paper_preview.jpg"></a>
+            </div>
+            <div style="width: 50%">
+                <p><b>A Dataset and Explorer for 3D Signed Distance Functions</b></p>
+                <p>Towaki Takikawa, Andrew Glassner, Morgan McGuire</p>
+
+                <div><span class="material-icons"> description </span><a href="https://jcgt.org/"> JCGT version</a></div>
+                <div><span class="material-icons"> description </span><a href="https://arxiv.org/"> arXiv version</a></div>
+                <div><span class="material-icons"> insert_comment </span><a href="assets/jcgt.bib"> BibTeX</a></div>
+                <div><span class="material-icons"> integration_instructions </span><a href="https://github.com/tovacinni/sdf-explorer"> Code</a></div>
+
+                <p>Please send feedback and questions to <a href="https://tovacinni.github.io">Towaki Takikawa</a>.</p>
+            </div>
+        </div>
+    </section>
+    <section id="dataset">
+        <h2>Dataset</h2>
+        <hr>
+        <p>Our dataset can be downloaded from <a href="https://drive.google.com/file/d/1StTkilQSk83lj60VaqcMHh3GT73CSIKT/view">here</a>.
+        This dataset includes 3 sampling distributions (uniformly random, near surface, on surface) of positions with their 
+        corresponding signed distance functions and gradients. We make these available as npz files. For 
+        more information on these npz files, please refer to the README of our <a href="https://github.com/tovacinni/sdf-explorer">code repostiory</a>.
+        </p>
+        <img width="100%" src="assets/dataset.jpg">
+        <p class="caption">
+            We collect a total of 67 signed distance functions from Shadertoy and other sources.
+        </p>
+    </section>
+
+    <section id="bibtex">
+        <h2>Citation</h2>
+        <hr>
+        <pre><code>
+@article{Takikawa2022SDF,
+  author =       {Towaki Takikawa and Andrew Glassner and Morgan McGuire}, 
+  title =        {A Dataset and Explorer for 3D Signed Distance Functions},
+  year =         2022,
+  month =        {March},
+  day =          25,
+  journal =      {Journal of Computer Graphics Techniques (JCGT)},
+  volume =       11,
+  number =       1,
+  pages =        {96--124},
+  url =          {http://jcgt.org/published/0011/01/06/},
+  issn =         {2331-7418}
+}          
+</code></pre>
+    </section>
+    
+    <section id="figures">
+        <h2>Figures</h2>
+        <hr>
+        <p>
+        You can download the uncompressed figures as a zip (12.1 MB)
+        <a href="https://drive.google.com/file/d/1qoGDl2KbHxneMUp8K6ldKY0lIqXRgzkG/view?usp=sharing">here</a>.
+        </p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <img width="100%" src="assets/teaser.jpg">
+        <p class="caption">
+        Four analytic signed distance functions (SDFs) from our dataset, whose zero level sets are detailed 3D shapes.
+        These are visualized in our real-time SDF explorer, with isosurfaces in space shown on a cutting plane.
+        </p>
+        <img width="75%" src="assets/fig2.jpg" class="image-center">
+        <p class="caption">
+Left: An infinite right circular cylinder along the Z axis. 
+Right: A bumpy landscape on a 2D domain.
+The points with the z value of 0 are marked
+with a thick black line. We call each set of
+points with the same height an isocontour.
+        </p>
+        <img width="75%" src="assets/fig4.jpg" class="image-center">
+        <p class="caption">
+(a) A segment of a plane (thickened for clarity). The surface normal points to the
+positive subspace. Points in the plane itself form the zero subspace, and the remaining points
+form thea negative subspace. (b) A sphere cut in two. The points outside form the positive
+subspace, points on the surface form the zero subspace, and points inside form the negative
+subspace.
+        </p>
+        <img width="75%" src="assets/fig5.jpg" class="image-center">
+        <p class="caption">
+(a) The space on the negative side of all six planes forms the inside, or negative
+subspace, of the composite cube. (b) Using CSG to start a face. The purple sphere has two
+smaller spheres (blue) removed with subtraction, and a cone (orange) added with union.
+        </p>
+        <img width="100%" src="assets/fig7.jpg">
+        <p class="caption">
+Left:
+Intersecting a SDF by ray marching. The green ray passes through the shape but the
+marcher never detects the intersections because the sampling points (dots) created by equal
+steps all happen to lie outside the shape. The marcher finds the intersection along the
+red ray, because one of the sample points (the red circle) lands inside the object, initiating a
+step of numerical root-finding to locate the intersection point (the black circle).
+Middle:
+A 2D example of sphere marching. At each step along the ray (a dot), we find a
+guaranteed lower bound to the surface (the radius of circle around that dot). We can advance
+at least that far along the ray for the next step. 
+Right: Here the ray is nearly parallel to a surface,
+so the step size will be nearly constant. The closer the ray is to the surface, the smaller the
+step size.
+        </p>
+        <img width="100%" src="assets/buggypiano.jpg">
+        <p class="caption">
+        Some problems in an SDF. Left: A grand piano. Right: A close-up of the keys.
+The smaller keys (black on a real piano) appear jagged on one side due to the accumulation
+of numerical errors.
+        </p>
+        <img width="100%" src="assets/sdf-explorer.jpg">
+        <p class="caption">
+        The user interface for the explorer tool, here visualizing the Fish SDF using an emerald matcap.
+    Each of the on-screen elements can be configured, including copyright text display and background image.
+        </p>
+        <img width="100%" src="assets/oldcar.jpg">
+        <p class="caption">
+        Five of the many shading options supported by the SDF Explorer tool, applied to the OldCar model.
+    (a-c) Three examples of data-driven matcap shading. Thousands of matcap spheres are available online. (d) 
+    Surface normal (x,y,z) values mapped to (r,g,b).  
+    (e) Magnitude of the mean curvature visualized as a gradient from flat (black) to maximally curved (red).
+        </p>
+        <img width="100%" src="assets/cutplanemode.jpg">
+        <p class="caption">
+            Rendering with a cutting plane. The black line corresponds to the zero level-set, and the lighter
+    lines show the isocurves at equally-spaced thresholds. 
+        </p>
+        <img width="100%" src="assets/truncated-snake.jpg">
+        <p class="caption">
+        Diagnosing a slow render time. The contour lines on the cutting plane show that
+this snake was modeled with a truncated SDF, because after a certain distance the contours no
+longer appear. This explains the slow rendering time for this model.
+        </p>
+        <img width="100%" src="assets/oldcar-discontv3.jpg">
+        <p class="caption">
+        Detecting SDF discontinuities. Middle: A car with its
+    SDF on a cutting plane. Left: A close-up from the center top of the cutting plane,
+    showing disconnected contour lines. Right: A close-up from the right side 
+    of the cutting plane, showing contours lines touching one another.
+        </p>
+        <img width="100%" src="assets/sampler.jpg">
+        <p class="caption">
+        Visualizations of four different patterns from our samplers. Each point cloud contains 1 million samples.
+    The coloring comes from assigning the (x,y,z) components of the
+    SDF's surface normal at each point to red, green, and blue, respectively.}
+        </p>
+    </section>
+
+    <section id="acknowledgements">
+        <h2>Acknowledgements</h2>
+        <hr>
+        <div class="row">
+            <p>We would like to give a big thanks to 
+            <a href="https://joeylitalien.github.io/">Joey Litalien</a> for his help with gathering some of the
+            signed distance functions and writing an early version of the deserializer. This website is 
+            mostly derived from the website for <a href="https://nv-tlabs.github.io/nglod/">NGLOD</a>, which Joey also hugely contributed to!
+            We would also like to thank Zander Majercik and Michael Stengel for their help with G3D.
+            </p>
+
+            <p>The signed distance functions featured in our dataset are derived from the works of many artists around 
+            the world, released under various open source licenses. Details about the source licenses
+            are all available inside Table 1 of the paper as well as the source code.
+            Most of the works were collected from <a href="https://www.shadertoy.com/">Shadertoy</a>.
+            These artists include Inigo Quilez, dr2,
+            XorDev, yuntaRobo, sukupaper, eiffie, Felipe Alfonso, BigWings, Antonalog, Thomas Hooper, Paul Malin,
+            jedi_cy, monsterkodi, Kim Berkeby, Flopine, dakrunch, Dean Edis, Gary Warne, Florian Berger, 
+            al13n, ZGuerrero, klk, Maurogik, nimitz, and Wes Bakane.
+            </p>
+
+            <p>One of our authors, Morgan McGuire was at NVIDIA for the majority of this work.
+            </p>
+        </div>
+    </section>
+</div>
+</body>
+</html>
+
