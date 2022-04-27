@@ -120,13 +120,13 @@ To cite our dataset, use the following bibtex:
   author =       {Towaki Takikawa and Andrew Glassner and Morgan McGuire}, 
   title =        {A Dataset and Explorer for 3D Signed Distance Functions},
   year =         2022,
-  month =        {March},
-  day =          25,
+  month =        {April},
+  day =          27,
   journal =      {Journal of Computer Graphics Techniques (JCGT)},
   volume =       11,
-  number =       1,
-  pages =        {96--124},
-  url =          {http://jcgt.org/published/0011/01/06/},
+  number =       2,
+  pages =        {1--29},
+  url =          {http://jcgt.org/published/0011/02/01/},
   issn =         {2331-7418}
 }          
 ```
