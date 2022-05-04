@@ -9,6 +9,8 @@ This is the official code repository for our JCGT paper on a new SDF dataset:
 
 <img src="media/demo.jpg" alt="drawing" height="400"/>
 
+In this work we provide a dataset and an explorer to visualize, analyze and work with signed distance functions (SDFs). We currently have 63 SDFs, and hopefully more in the future!
+
 If you have any feature requests, feel free to submit an issue!
 
 ## Downloading the Dataset
