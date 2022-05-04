@@ -9,6 +9,8 @@ This is the official code repository for our JCGT paper:
 
 <img src="media/demo.jpg" alt="drawing" height="400"/>
 
+If you have any feature requests, feel free to submit an issue!
+
 ## Downloading the Dataset
 
 Our dataset is available as `.npz` files for download [here](https://drive.google.com/file/d/1StTkilQSk83lj60VaqcMHh3GT73CSIKT/view?usp=sharing) 
