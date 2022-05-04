@@ -1,6 +1,6 @@
 ## A Dataset and Explorer for 3D Signed Distance Functions
 
-This is the official code repository for our JCGT paper: 
+This is the official code repository for our JCGT paper on a new SDF dataset:
 
 [A Dataset and Explorer for 3D Signed Distance Functions (JCGT/I3D 2022)](https://tovacinni.github.io/sdf-explorer)
 
