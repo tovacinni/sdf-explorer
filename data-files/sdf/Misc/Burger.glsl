@@ -1,7 +1,7 @@
 /*
 Copyright 2019 Xor @XorDev
 License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
-Link: https://www.shadertoy.com/view/Wsf3D7
+Link: https://www.shadertoy.com/view/WsXSDH
 */
 
 /******************************************************************************
