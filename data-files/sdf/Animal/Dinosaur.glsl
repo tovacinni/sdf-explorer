@@ -277,7 +277,7 @@ mat3 RotMat(vec3 axis, float angle)
 }
 
 float sdf(vec3 p) {
-  p = p * RotMat(vec3(0.,1.,0.), -(3.14/2));
+  p = p * RotMat(vec3(0.,1.,0.), -(3.14/2.));
   const float scale = 0.25;
   p *= 1. / scale;
   return mapArlo(p) * scale;
