@@ -25,7 +25,6 @@ matcap_paths = {
     "Clay/Blue.png" : "https://raw.githubusercontent.com/nidorx/matcaps/master/1024/6C8996_14223F_B9DEDD_2E445C.png",
     "Metal/Aluminium.png" : "https://raw.githubusercontent.com/nidorx/matcaps/master/1024/C7C7D7_4C4E5A_818393_6C6C74.png",
     "Plastic/Red.png" : "https://raw.githubusercontent.com/nidorx/matcaps/master/1024/9D282A_38191D_DFC6CD_D6495A.png",
-    "Toon/Gray.png" : "https://market-assets.fra1.cdn.digitaloceanspaces.com/market-assets/materials/toon/toon.jpg"
 }
 
 matcap_dir = "data-files/matcap"
