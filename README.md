@@ -44,6 +44,7 @@ For the code to properly run, you will need to download a few matcap files. To d
 ```
 pip install wget
 python download_matcaps.py
+git lfs pull
 ```
 
 Alternatively, if you have your own matcaps or download matcaps yourself from the internet, you can 
@@ -54,6 +55,7 @@ place them in `data-files/matcap/categoryname/yourmatcap.png`.
 To build and run for Linux, simply run:
 
 ```
+git lfs pull
 icompile --opt --run
 ```
 
