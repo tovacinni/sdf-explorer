@@ -54,6 +54,12 @@ float sdEllipsoid( in vec3 p, in vec3 r )
     return d * smallestSize;
 }
 
+float sdBox( vec3 p, vec3 b )
+{
+    vec3 d = abs(p) - b;
+    return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+}
+
 float wings(in vec3 p) 
 {   
     vec3 r = vec3(1.5, 0.15, 0.55);
@@ -111,13 +117,9 @@ float mantabody(in vec3 p)
     }
     
     // tail
-    if (p.z>0.0) {    
-        float taild = length(p.xy);
-        d = softMin(d,taild,0.1);
-        d = max(d, smoothstep(2.3,2.5,p.z));
-    }
-    
-    
+    float taild = max(length(p.xy), -sdBox(p+vec3(0.0,0.0,1.0), vec3(1.0)));
+    d = softMin(d,taild,0.1);
+
     return d;
 }
 
