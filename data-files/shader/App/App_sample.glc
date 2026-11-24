@@ -77,6 +77,11 @@ vec4 sdf_normal(vec3 p) {
     return vec4(n, sdf_bounded(p));
 }
 
+/** True when p lies in the [-1, 1] cube that sdf_bounded clips the SDF to. */
+bool insideSampleCube(vec3 p) {
+    return all(lessThanEqual(abs(p), vec3(1.0)));
+}
+
 #include ACTIVE_SAMPLER
 
 void main() {

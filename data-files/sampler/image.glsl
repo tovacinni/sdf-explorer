@@ -20,10 +20,12 @@
 #ifndef image_glsl
 #define image_glsl
 
+// Pixel (x, y) of the size x size sample grid is the point
+// (-1 + 2x/(size-1), -1 + 2y/(size-1), 0), so the lattice spans [-1, 1] on
+// both axes including the edges.
 vec4 sdf_sampler(vec2 uv, int size) {
-    vec3 p = vec3((uv/size) * 2.0 - 1.0, 0.0);
+    vec3 p = vec3((uv / float(max(size - 1, 1))) * 2.0 - 1.0, 0.0);
     return vec4(p, sdf_bounded(p));
 }
 
 #endif
-

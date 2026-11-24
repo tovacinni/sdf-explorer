@@ -32,7 +32,7 @@ bool raystab(vec3 rayOrigin, vec3 random_idx, out vec3 hitpoint) {
     for (int i=0; i<100; ++i){ 
         vec3 n = gaussian(random_uv).xyz;
         vec3 rayDirection = (1.0 / length(n)) * n; // Sphere point select
-        if (intersectSDF(rayOrigin, rayDirection, 20.0, t, temp)) {
+        if (intersectSDF(rayOrigin, rayDirection, 20.0, t, temp) && insideSampleCube(temp)) {
             hitpoint = temp;
             return true; // If found, return the hitpoint
         }
@@ -42,12 +42,14 @@ bool raystab(vec3 rayOrigin, vec3 random_idx, out vec3 hitpoint) {
     return false; // If not found, return input
 }
 
-// Step 0 stabs a ray from a random point in the [-1, 1] cube; a sample whose
-// first stab misses the surface is all NaN. Each of the NUM_ITER later steps
-// stabs a ray from a new random origin and moves to its hit point when the
-// hit has a larger absolute mean curvature than the current point. raystab
-// and sdf_curv each appear once so the compiler inlines one copy of the SDF
-// per call; large SDFs exceed the GLSL compiler's limits otherwise.
+// Metropolis-Hastings chain with target density proportional to the absolute
+// mean curvature on the zero level set inside the [-1, 1] cube. Step 0 stabs a
+// ray from a random point in the cube; a sample whose first stab misses is all
+// NaN. Each of the NUM_ITER later steps proposes the hit of a ray from a new
+// random origin and accepts it with probability
+// min(1, |curv(next)| / |curv(p)|). raystab and sdf_curv each appear once so
+// the compiler inlines one copy of the SDF per call; large SDFs exceed the
+// GLSL compiler's limits otherwise.
 vec4 sdf_sampler(vec2 uv, int size) {
     vec3 random_idx = rand(uv/size).xyz;
     vec3 p = vec3(NaN, NaN, NaN);
@@ -58,7 +60,9 @@ vec4 sdf_sampler(vec2 uv, int size) {
         vec3 next;
         if (raystab(rayOrigin, random_idx, next)) {
             float nextCurvature = abs(sdf_curv(next));
-            if ((i == 0) || (nextCurvature > pCurvature)) {
+            // A uniform draw from a coordinate that the origin and direction did not use.
+            float u = rand(fract(random_idx.zx + uv / size)).y;
+            if ((i == 0) || (u * pCurvature < nextCurvature)) {
                 p = next;
                 pCurvature = nextCurvature;
             }

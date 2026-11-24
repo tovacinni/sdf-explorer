@@ -21,14 +21,15 @@
 #define jitter_glsl
 
 // Sample index idx is lattice point (x, y, z) with idx = (z * r + y) * r + x,
-// r = gridResolution, mapped to [-1, 1 - 2/r] on each axis.
+// r = gridResolution, at -1 + 2i/(r-1) on each axis, so the lattice spans
+// [-1, 1] including the cube's faces.
 vec4 sdf_sampler(vec2 uv, int size) {
     int idx = int(uv.y) * size + int(uv.x);
     int x = idx % gridResolution;
     int y = (idx / gridResolution) % gridResolution;
     int z = idx / (gridResolution * gridResolution);
-    vec3 p = (vec3(x, y, z) / float(gridResolution)) * 2.0 - 1.0;
-    p += (rand(uv/size).xyz * 2.0 - 1.0) / float(gridResolution);
+    vec3 p = (vec3(x, y, z) / float(max(gridResolution - 1, 1))) * 2.0 - 1.0;
+    p += (rand(uv/size).xyz * 2.0 - 1.0) / float(max(gridResolution - 1, 1));
     return vec4(p, sdf_bounded(p));
 }
 

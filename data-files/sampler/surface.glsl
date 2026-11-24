@@ -17,11 +17,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-#ifndef trace_glsl
-#define trace_glsl
+#ifndef surface_glsl
+#define surface_glsl
 
 const float NaN = uintBitsToFloat(0x7fc00000);
 
+// A point on the zero level set, found by tracing a ray from a uniform point in
+// the [-1, 1] cube in a uniform direction. A hit outside the cube counts as a
+// miss: sdf_bounded there is the distance to the cube, not to the shape. After
+// 100 misses the sample is all NaN.
 vec4 sdf_sampler(vec2 uv, int size) {
     vec3 rayOrigin = vec3(rand(uv/size).xyz) * 2.0 - 1.0;
     vec3 p;
@@ -30,7 +34,7 @@ vec4 sdf_sampler(vec2 uv, int size) {
     for (int i=0; i<100; ++i){
         vec3 n = gaussian(random_idx).xyz;
         vec3 rayDirection = (1.0 / length(n)) * n;
-        if (intersectSDF(rayOrigin, rayDirection, 20.0, t, p)) {
+        if (intersectSDF(rayOrigin, rayDirection, 20.0, t, p) && insideSampleCube(p)) {
             return vec4(p, sdf_bounded(p));
         }
         random_idx = rand(random_idx).xy;
@@ -41,4 +45,3 @@ vec4 sdf_sampler(vec2 uv, int size) {
 }
 
 #endif
-

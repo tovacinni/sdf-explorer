@@ -22,19 +22,25 @@
 
 const int NUM_ITER = 50;
 
+// Metropolis-Hastings chain with target density proportional to 1/|s(p)| on
+// the [-1, 1] cube, which concentrates samples near the zero level set.
+// Proposals are Gaussian steps (sigma 0.2); a step is accepted with
+// probability min(1, |s(p)| / |s(next)|), and a step leaving the cube is
+// rejected.
 vec4 sdf_sampler(vec2 uv, int size) {
     vec3 p = vec3(rand(uv/size).xyz) * 2.0 - 1.0;
+    float pDistance = abs(sdf_bounded(p));
     vec3 random_idx = rand(uv/size).xyz;
     for (int i=0; i<NUM_ITER; ++i) {
-        // Next step
-        vec3 delta = gaussian(random_idx.xy).xyz * 0.2;
-        vec3 next = p + delta;
-
-        // Calculate acceptance probability
-        float ratio = abs(sdf_bounded(next)) / abs(sdf_bounded(p));
-
-        if (min(1, ratio) < 1.0) {
-            p = next;
+        vec3 next = p + gaussian(random_idx.xy).xyz * 0.2;
+        // random_idx.z is a uniform draw independent of the gaussian lookup at random_idx.xy.
+        float u = random_idx.z;
+        if (insideSampleCube(next)) {
+            float nextDistance = abs(sdf_bounded(next));
+            if (u * nextDistance < pDistance) {
+                p = next;
+                pDistance = nextDistance;
+            }
         }
         random_idx = rand(fract(random_idx.xy + uv / size)).xyz;
     }
@@ -42,4 +48,3 @@ vec4 sdf_sampler(vec2 uv, int size) {
 }
 
 #endif
-
