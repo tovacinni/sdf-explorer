@@ -62,12 +62,42 @@ icompile --opt --run
 To run the sampling mechanism, run:
 
 ```
-icompile --run --sample <Pattern> <N> <SDF> <outfile>
+icompile --run --sample <N> <Pattern> <SDF> <outdir>
 ```
 
-Where the argument to `<Pattern>` is the name of the sampler shader,
-`<N>` is the number of points to sample, `<SDF>` is the name of the SDF shader,
-and `<outfile>` is the file path to save the point samples to.
+Where `<N>` is the number of points to sample, the argument to `<Pattern>` is the name of the
+sampler shader, `<SDF>` is the name of the SDF shader, and `<outdir>` is the directory that
+receives the samples as `<outdir>/<Pattern>/<SDF>.bin`.
+
+### Headless Linux (EGL)
+
+On a machine without a display (a GPU server or cluster node), build G3D with its EGL
+libraries (`./buildg3d lib` builds `G3D-gfx-egl` and `G3D-app-egl` on Linux) and then build the
+explorer against them. On GCC 13 or newer, G3D's bundled TBB 2020 does not compile
+(`-Wchanges-meaning` is an error); build it with clang by passing `compiler=clang` to the
+`make` call in `buildg3d`'s `tbbTarget`.
+
+```
+icompile --egl --opt
+cd build
+./sdf-explorer-egl --sample 1000000 surface Teapot ../samples
+```
+
+iCompile keeps the compiler options of the previous build in
+`.ice-tmp/sdf-explorer/.icompile-cache`, so delete that file when switching between
+`icompile --egl` and a plain `icompile`; otherwise the second build compiles with the first
+one's `-DGLEW_EGL` setting and fails to link.
+
+The EGL build renders into an offscreen buffer on the GPU through `EGL_PLATFORM_DEVICE_EXT`
+and needs no X server. It only samples; it has no interactive window. `G3D10DATA` must point
+at the G3D data directories, as in `set_g3d_env.sh`.
+
+To sample every SDF with the patterns used for the released dataset and save `.npz` files:
+
+```
+cd sdfdes
+python sample_all.py --out ../samples
+```
 
 ### Loading the Binaries
 
