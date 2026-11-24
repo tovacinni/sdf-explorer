@@ -15,34 +15,69 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import os
-import torch
-import subprocess as sp 
-import sdfdes
-import polyscope as ps
+"""Sample every SDF in data-files/sdf with the SDF Explorer and save .npz files.
+
+Runs the explorer binary once per (pattern, SDF) and writes
+<out>/<pattern>/<SDF>.bin (the explorer's output) and <out>/<pattern>/<SDF>.npz
+with arrays `position` (N, 3), `distance` (N, 1) and `gradient` (N, 3).
+
+The default binary is build/sdf-explorer-egl, which `icompile --egl --opt`
+builds; it renders through EGL on the GPU and needs no display.
+"""
+
+import argparse
 import glob
+import os
+import subprocess as sp
+
 import numpy as np
 
-# Paths
-viewer_path = os.path.abspath('../')
-sample_path = os.path.join(viewer_path, 'samples')
-methods = {'rand': 1000000, 'near': 2000000, 'surface': 2000000}
-shape = 'Fish'
+import sdfdes
 
-shader_path = "data-files/sdf"
-shaders = glob.glob(os.path.join(viewer_path, shader_path, "**/*.glsl"))
+viewer_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-for shader in shaders:
-    for method in methods:
-        size = methods[method]
-        shape = os.path.splitext(os.path.basename(shader))[0]
-        dist_path = os.path.join(sample_path, f'{method}/{shape}.bin')
-        cmd = f'icompile --run --sample {size} {method} {shape} {sample_path}'
 
-        # Sample points using the G3D SDF explorer
-        proc = sp.check_output(cmd.split(), shell=False, cwd=viewer_path)
+def parse_methods(specs):
+    methods = {}
+    for spec in specs:
+        name, count = spec.split(':')
+        methods[name] = int(count)
+    return methods
 
-        pos, dist, normal = sdfdes.deserialize(dist_path)
-        out_path = os.path.join(sample_path, f'{method}/{shape}.npz')
-        np.savez(out_path, position=pos.numpy(), distance=dist.numpy(), gradient=normal.numpy())
 
+def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--explorer', default=os.path.join(viewer_path, 'build', 'sdf-explorer-egl'),
+                        help='SDF Explorer executable')
+    parser.add_argument('--out', default=os.path.join(viewer_path, 'samples'),
+                        help='directory that receives <pattern>/<SDF>.bin and .npz')
+    parser.add_argument('--methods', nargs='+', default=['rand:1000000', 'near:2000000', 'surface:2000000'],
+                        help='<pattern>:<N> pairs; pattern is a file name in data-files/sampler')
+    parser.add_argument('--shapes', nargs='*', default=None,
+                        help='SDF base names; default is every file under data-files/sdf')
+    args = parser.parse_args()
+
+    explorer = os.path.abspath(args.explorer)
+    out = os.path.abspath(args.out)
+    methods = parse_methods(args.methods)
+    shapes = args.shapes or sorted(os.path.splitext(os.path.basename(s))[0]
+                                   for s in glob.glob(os.path.join(viewer_path, 'data-files', 'sdf', '*', '*.glsl')))
+
+    for shape in shapes:
+        for method, size in methods.items():
+            cmd = [explorer, '--sample', str(size), method, shape, out]
+            # The explorer finds its sampler and SDF shaders relative to its
+            # working directory, which icompile fills next to the binary.
+            sp.run(cmd, check=True, cwd=os.path.dirname(explorer), stdout=sp.DEVNULL, timeout=1800)
+
+            bin_path = os.path.join(out, method, f'{shape}.bin')
+            pos, dist, normal = sdfdes.deserialize(bin_path)
+            if not bool((pos != 0).any()):
+                raise RuntimeError(f'{bin_path} holds only zeros: the sampling dispatch did not run')
+            np.savez(os.path.join(out, method, f'{shape}.npz'),
+                     position=pos.numpy(), distance=dist.numpy(), gradient=normal.numpy())
+            print(f'{method:22s} {shape:16s} {size}', flush=True)
+
+
+if __name__ == '__main__':
+    main()

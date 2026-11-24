@@ -18,9 +18,18 @@
  ******************************************************************************/
 
 #include "App.h"
+#ifdef GLEW_EGL
+#   include <unistd.h>
+#endif
 
-// Set to 1 to compile for headless Linux clusters or remote development
-#define USE_EGL 0
+// `icompile --egl` defines GLEW_EGL and links G3D-app-egl: that build renders
+// into an EGL pbuffer on the GPU, needs no X display, and has no debug or
+// developer windows.
+#ifdef GLEW_EGL
+#   define USE_EGL 1
+#else
+#   define USE_EGL 0
+#endif
 
 G3D_START_AT_MAIN();
 
@@ -86,7 +95,7 @@ int main(int argc, const char* argv[]) {
         settings.window.visible = false;
     }
     OSWindow* window = nullptr;
-    if (settings.argArray.contains("--headless")) {
+    if (USE_EGL || settings.argArray.contains("--headless")) {
 #       if USE_EGL
 #           ifndef G3D_LINUX
 #               error "USE_EGL is only supported on Linux"
@@ -94,10 +103,26 @@ int main(int argc, const char* argv[]) {
                 window = EGLWindow::create(settings.window);
 #           endif
 #       else
-            alwaysAssertM(false, "--headless requires compiling with #define USE_EGL 1");
+            alwaysAssertM(false, "--headless requires the EGL build (icompile --egl)");
 #       endif
     }
-    return App(settings, window).run();
+    int exitCode = 0;
+    {
+        App app(settings, window);
+        exitCode = app.run();
+    }
+#   if USE_EGL
+        // The NVIDIA EGL driver tears down its state in its own exit handler,
+        // and G3D's static GL objects (SkyboxSurface's index buffers, the
+        // GLPixelTransferBuffer free list) call into it from later exit
+        // handlers and static destructors, which crashes with SIGSEGV after
+        // the samples are on disk. Leave without running them; every output
+        // file has already been committed and closed.
+        fflush(stdout);
+        fflush(stderr);
+        _exit(exitCode);
+#   endif
+    return exitCode;
 }
 
 App::App(const VRApp::Settings& settings, OSWindow* window) : super(settings, window) {}
@@ -225,16 +250,20 @@ void App::onInit() {
 
     setFrameDuration(1.0f / 240.0f);
     showRenderingStats  = false;
+#   if ! USE_EGL
     developerWindow->sceneEditorWindow->setVisible(false);
     developerWindow->setVisible(false);
     developerWindow->cameraControlWindow->setVisible(false);
     developerWindow->cameraControlWindow->moveTo(Point2(developerWindow->cameraControlWindow->rect().x0(), 0));
     developerWindow->videoRecordDialog->setCaptureGui(false);
+#   endif
 
     loadScene("SDF Explorer");
     m_debugController->setMoveRate(1.0f);
 
+#   if ! USE_EGL
     makeGUI();
+#   endif
 
     setActiveCamera(m_debugCamera);
 
@@ -242,6 +271,10 @@ void App::onInit() {
     // Uses basename as argument, not full GLSL path
     // Example: icompile --run --sample Sphere
     if (settings().argArray.contains("--sample")) {
+        // A failed shader compile would otherwise open a Retry/Debug/Exit
+        // prompt; without a person to answer it the explorer recompiles and
+        // rewrites the log forever.
+        Shader::setFailureBehavior(Shader::EXCEPTION);
         if (settings().argArray.end() - settings().argArray.find("--sample") != 5) {
             debugPrintf("Invalid arguments\n");
             printf("Format: sdf-explorer [--help] [--sample <N> <Pattern> <SDF> <outfile>]\n\n");
@@ -542,7 +575,7 @@ void App::writeBinary(
     shared_ptr<GLPixelTransferBuffer> &ssbo_distance,
     shared_ptr<GLPixelTransferBuffer> &ssbo_normal) {
 
-    const String& scheme = stringSplit(m_samplerArray[m_activeSampler], '.')[0];
+    const String scheme = stringSplit(m_samplerArray[m_activeSampler], '.')[0];
     
     if (! FileSystem::exists(m_sampleBase)) {
         FileSystem::createDirectory(m_sampleBase);
