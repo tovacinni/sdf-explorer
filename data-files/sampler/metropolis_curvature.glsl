@@ -17,51 +17,49 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-#ifndef rand_glsl
-#define rand_glsl
+#ifndef metropolis_curvature_glsl
+#define metropolis_curvature_glsl
 
 const int NUM_ITER = 25;
 
 const float NaN = uintBitsToFloat(0x7fc00000);
 
-bool raystab(vec3 rayOrigin, vec3 random_idx, out vec3 hitpoint) {
+// Traces up to 100 rays in uniform directions from rayOrigin and returns the
+// first hit inside the [-1, 1] cube.
+bool raystab(vec3 rayOrigin, vec2 uv, inout uint draw, out vec3 hitpoint) {
     vec3 temp;
-    vec2 random_uv = random_idx.xy;
     float t;
-    // Raystab
-    for (int i=0; i<100; ++i){ 
-        vec3 n = gaussian(random_uv).xyz;
-        vec3 rayDirection = (1.0 / length(n)) * n; // Sphere point select
+    for (int i = 0; i < 100; ++i) {
+        vec3 rayDirection = normalize(nextGaussian(uv, draw));
         if (intersectSDF(rayOrigin, rayDirection, 20.0, t, temp) && insideSampleCube(temp)) {
             hitpoint = temp;
-            return true; // If found, return the hitpoint
+            return true;
         }
-        random_uv = rand(random_uv).xy; // Reroll
     }
     hitpoint = rayOrigin;
-    return false; // If not found, return input
+    return false;
 }
 
 // Metropolis-Hastings chain with target density proportional to the absolute
 // mean curvature on the zero level set inside the [-1, 1] cube. Step 0 stabs a
-// ray from a random point in the cube; a sample whose first stab misses is all
+// ray from a uniform point in the cube; a sample whose first stab misses is all
 // NaN. Each of the NUM_ITER later steps proposes the hit of a ray from a new
-// random origin and accepts it with probability
-// min(1, |curv(next)| / |curv(p)|). raystab and sdf_curv each appear once so
-// the compiler inlines one copy of the SDF per call; large SDFs exceed the
-// GLSL compiler's limits otherwise.
+// uniform origin and accepts it with probability
+// min(1, |curv(next)| / |curv(p)|). The accepted point is then moved by
+// N(0, 0.01^2) per axis. raystab and sdf_curv each appear once so the compiler
+// inlines one copy of the SDF per call; large SDFs exceed the GLSL compiler's
+// limits otherwise.
 vec4 sdf_sampler(vec2 uv, int size) {
-    vec3 random_idx = rand(uv/size).xyz;
+    uint draw = 0u;
     vec3 p = vec3(NaN, NaN, NaN);
     float pCurvature = 0.0;
 
     for (int i = 0; i <= NUM_ITER; ++i) {
-        vec3 rayOrigin = random_idx * 2.0 - 1.0;
+        vec3 rayOrigin = nextUniform(uv, draw) * 2.0 - 1.0;
         vec3 next;
-        if (raystab(rayOrigin, random_idx, next)) {
+        if (raystab(rayOrigin, uv, draw, next)) {
             float nextCurvature = abs(sdf_curv(next));
-            // A uniform draw from a coordinate that the origin and direction did not use.
-            float u = rand(fract(random_idx.zx + uv / size)).y;
+            float u = nextUniform(uv, draw).x;
             if ((i == 0) || (u * pCurvature < nextCurvature)) {
                 p = next;
                 pCurvature = nextCurvature;
@@ -69,9 +67,8 @@ vec4 sdf_sampler(vec2 uv, int size) {
         } else if (i == 0) {
             return vec4(p, sdf(p));
         }
-        random_idx = rand(fract(random_idx.xy + uv / size)).xyz;
     }
-    p += gaussian(random_idx.xy).xyz * 0.01;
+    p += nextGaussian(uv, draw) * 0.01;
     return vec4(p, sdf_bounded(p));
 }
 

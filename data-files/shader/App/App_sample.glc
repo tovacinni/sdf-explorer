@@ -77,6 +77,35 @@ vec4 sdf_normal(vec3 p) {
     return vec4(n, sdf_bounded(p));
 }
 
+// Per-run seed from the CPU; different runs of the same pattern draw different numbers.
+uniform uint randomSeed;
+
+/** PCG3D hash (Jarzynski and Olano 2020, "Hash Functions for GPU Rendering"). */
+uvec3 pcg3d(uvec3 v) {
+    v = v * 1664525u + 1013904223u;
+    v.x += v.y * v.z; v.y += v.z * v.x; v.z += v.x * v.y;
+    v ^= v >> 16u;
+    v.x += v.y * v.z; v.y += v.z * v.x; v.z += v.x * v.y;
+    return v;
+}
+
+/** Three uniform [0, 1) numbers that depend only on the sample's pixel, the
+    run seed, and the draw counter, which this call advances. Unlike an
+    iterated texture lookup, two samples never share a stream, so chains that
+    draw many numbers (the metropolis samplers) stay independent. */
+vec3 nextUniform(vec2 pixel, inout uint draw) {
+    uvec3 h = pcg3d(uvec3(uint(pixel.x), uint(pixel.y), (draw * 0x9E3779B9u) ^ randomSeed));
+    draw += 1u;
+    return vec3(h >> 8u) * (1.0 / 16777216.0);
+}
+
+/** Three independent standard normal numbers (Box-Muller); advances draw by two. */
+vec3 nextGaussian(vec2 pixel, inout uint draw) {
+    vec3 a = nextUniform(pixel, draw);
+    vec3 b = nextUniform(pixel, draw);
+    return sqrt(-2.0 * log(max(a, vec3(1e-7)))) * cos(6.28318530718 * b);
+}
+
 /** True when p lies in the [-1, 1] cube that sdf_bounded clips the SDF to. */
 bool insideSampleCube(vec3 p) {
     return all(lessThanEqual(abs(p), vec3(1.0)));
