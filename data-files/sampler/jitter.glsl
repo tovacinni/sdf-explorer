@@ -17,18 +17,19 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-#ifndef grid_glsl
-#define grid_glsl
+#ifndef jitter_glsl
+#define jitter_glsl
 
+// Sample index idx is lattice point (x, y, z) with idx = (z * r + y) * r + x,
+// r = gridResolution, mapped to [-1, 1 - 2/r] on each axis.
 vec4 sdf_sampler(vec2 uv, int size) {
-    int idx = (int) uv.y * size + (int) uv.x;
-    int x = idx % (size / 10);
-    int z = idx / (size * 10);
-    int y = (idx - (z * size * 10))  / (size / 10);
-    vec3 p = (vec3(x,y,z) / 100.0) * 2.0 - 1.0;
-    p += (rand(uv/size).xyz * 2.0 - 1.0) / 100.0;
+    int idx = int(uv.y) * size + int(uv.x);
+    int x = idx % gridResolution;
+    int y = (idx / gridResolution) % gridResolution;
+    int z = idx / (gridResolution * gridResolution);
+    vec3 p = (vec3(x, y, z) / float(gridResolution)) * 2.0 - 1.0;
+    p += (rand(uv/size).xyz * 2.0 - 1.0) / float(gridResolution);
     return vec4(p, sdf_bounded(p));
 }
 
 #endif
-

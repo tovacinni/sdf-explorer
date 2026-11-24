@@ -21,6 +21,7 @@
 
 #include <G3D/G3D.h>
 #include <map>
+#include <random>
 
 typedef GApp AppBase;
 
