@@ -1,2 +1,6 @@
 torch
 glob
+numpy
+scipy
+scikit-image
+trimesh

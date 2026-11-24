@@ -47,6 +47,104 @@ The `grid` files also hold `volume`, the distances as an (r, r, r) array indexed
 `axis`, the coordinate of index i on every axis; the `image` files hold `slice`, indexed `[x, y]`, and
 `axis`.
 
+## Measured Accuracy of Each SDF
+
+Table 1 of the paper labels each SDF exact (E) or conservative (C). We measured every SDF against
+its true distance field; 26 of the 63 do not match their label, and some overestimate distance,
+which breaks sphere tracing and the `surface` and `near` samplers.
+
+For each SDF, `sdfdes/classify_sdfs.py` runs the explorer and compares the raw `sdf()` with the
+distance to a reference surface:
+
+- The reference surface is marching cubes on a 200³ `grid` sample. For an SDF with no grid point
+  inside it (Bezier, Triangle, Serpinski) it is the `surface` sampler's points instead.
+- `accuracy_pairs` samples 800k points in [-2, 2]³. "Exact within 5%" is the fraction of points
+  whose |sdf| is within 5% of the true distance, in three bands of true distance: near
+  (0.02–0.05), mid (0.05–0.3) and far (0.3 and up). Points come in pairs 0.01 apart, and a pair
+  whose values differ by more than 0.02 is a jump.
+- `accuracy_ball` proves overestimation without the reference surface: it picks a point p and a
+  point q inside the ball of radius 0.95·|sdf(p)| around p, and checks whether sdf changes sign
+  between them. "Proven overestimate" is the fraction of points inside the [-1, 1] cube where
+  it does.
+- `accuracy_far` samples radius 1 to 100 for the far field.
+
+"Exact" means more than 90% of points are within 5% of the true distance in all three bands. An
+SDF overestimates when the sign test fails at 0.1% or more of the points, and slightly
+overestimates from 0.01%; rates near these cutoffs vary by a few hundredths of a percent between
+runs. To rerun the measurement on the EGL build:
+
+```
+cd sdfdes
+pip install -r requirements.txt
+python classify_sdfs.py --out sdf_accuracy.csv
+```
+
+| SDF | Table 1 | Measured | Exact within 5% (near / mid / far) | Proven overestimate | Notes |
+|---|---|---|---|---|---|
+| Bezier | E | exact | 1.00 / 1.00 / 1.00 | 0.000% | reference: surface samples |
+| Boat | C | overestimates | 0.00 / 0.02 / 0.09 | 0.563% | jumps at 0.05% of point pairs |
+| Burger | C | slightly overestimates | 0.09 / 0.05 / 0.20 | 0.055% | jumps at 0.86% of point pairs |
+| Cables | C | conservative | 0.04 / 0.02 / 0.00 | 0.002% | jumps at 0.07% of point pairs |
+| Capsule | E | exact | 1.00 / 1.00 / 1.00 | 0.000% |  |
+| Castle | C | overestimates | 0.00 / 0.00 / 0.00 | 0.409% | jumps at 0.15% of point pairs; 0.22× the distance beyond radius 20 |
+| Chain | C | conservative | 0.00 / 0.00 / 0.00 | 0.000% | jumps at 0.22% of point pairs |
+| Cheese | C | near-exact near the surface, conservative farther | 0.82 / 0.69 / 0.04 | 0.003% |  |
+| Cone | E | exact near the surface, conservative farther | 0.98 / 0.90 / 0.76 | 0.000% |  |
+| Cube | E | exact | 0.99 / 1.00 / 1.00 | 0.000% |  |
+| Cybertruck | C | conservative | 0.07 / 0.14 / 0.00 | 0.006% |  |
+| Cylinder | E | exact | 0.99 / 1.00 / 1.00 | 0.000% |  |
+| Dalek | C | conservative | 0.00 / 0.00 / 0.00 | 0.000% | jumps at 0.10% of point pairs; too large beyond radius 20 at 0.1% of points |
+| Dinosaur | C | conservative | 0.38 / 0.36 / 0.30 | 0.000% | jumps at 0.13% of point pairs |
+| Dodecahedron | E | exact near the surface, conservative farther | 0.97 / 0.88 / 0.56 | 0.000% |  |
+| Elephant | C | conservative | 0.00 / 0.00 / 0.00 | 0.000% |  |
+| Fish | C | conservative | 0.00 / 0.00 / 0.00 | 0.000% | 0.25× the distance beyond radius 20 |
+| Gear | C | near-exact near the surface, conservative farther | 0.88 / 0.63 / 0.29 | 0.000% | jumps at 0.18% of point pairs |
+| Girl | C | overestimates | 0.01 / 0.01 / 0.13 | 12.586% | jumps at 27.12% of point pairs |
+| GrandPiano | C | slightly overestimates | 0.52 / 0.79 / 0.85 | 0.019% | jumps at 0.50% of point pairs |
+| Helix | E | conservative | 0.17 / 0.02 / 0.00 | 0.001% |  |
+| Hexprism | E | exact | 0.98 / 1.00 / 1.00 | 0.000% |  |
+| HumanHead | C | conservative | 0.28 / 0.35 / 0.03 | 0.000% |  |
+| HumanSkull | C | near-exact near the surface, conservative farther | 0.68 / 0.83 / 0.14 | 0.000% | 0.02× the distance beyond radius 20 |
+| Icosahedron | E | exact near the surface, conservative farther | 0.97 / 0.94 / 0.79 | 0.000% |  |
+| Jellyfish | E | conservative | 0.01 / 0.00 / 0.00 | 0.000% | jumps at 0.42% of point pairs |
+| Jetfighter | C | conservative | 0.08 / 0.03 / 0.00 | 0.005% |  |
+| Julia | E | slightly overestimates | 0.01 / 0.00 / 0.01 | 0.100% | too large beyond radius 20 at 53.0% of points |
+| Key | C | near-exact near the surface, conservative farther | 0.81 / 0.69 / 0.30 | 0.000% |  |
+| Knob | E | near-exact near the surface, conservative farther | 0.69 / 0.52 / 0.20 | 0.000% |  |
+| Lamborghini | C | slightly overestimates | 0.66 / 0.63 / 0.70 | 0.098% | jumps at 0.20% of point pairs |
+| Mandelbulb | E | slightly overestimates | 0.00 / 0.00 / 0.33 | 0.012% | jumps at 0.17% of point pairs |
+| MantaRay | C | conservative | 0.00 / 0.00 / 0.00 | 0.001% | 0.22× the distance beyond radius 20 |
+| Mech | C | overestimates | 0.01 / 0.01 / 0.05 | 32.402% | jumps at 48.42% of point pairs; NaN/inf at 0.15% of points |
+| Menger | E | conservative | 0.04 / 0.55 / 0.49 | 0.000% |  |
+| Mobius | E | conservative | 0.41 / 0.57 / 0.52 | 0.000% | jumps at 0.47% of point pairs |
+| Mountain | C | conservative | 0.50 / 0.48 / 0.03 | 0.001% | jumps at 0.17% of point pairs |
+| Mushroom | C | conservative | 0.01 / 0.02 / 0.00 | 0.000% | jumps at 0.22% of point pairs; 0.12× the distance beyond radius 20 |
+| Octabound | C | exact near the surface, conservative farther | 0.91 / 0.69 / 0.48 | 0.000% |  |
+| Octahedron | E | exact | 0.95 / 0.99 / 1.00 | 0.000% |  |
+| Oldcar | C | slightly overestimates | 0.17 / 0.33 / 0.32 | 0.010% | jumps at 0.24% of point pairs |
+| PixarMike | C | conservative | 0.12 / 0.07 / 0.00 | 0.002% | jumps at 0.19% of point pairs |
+| Pyramid | E | overestimates | 0.69 / 0.76 / 0.97 | 2.221% |  |
+| Rock | E | conservative | 0.05 / 0.01 / 0.00 | 0.002% |  |
+| Rooks | C | conservative | 0.00 / 0.00 / 0.00 | 0.000% |  |
+| Roundbox | E | exact | 1.00 / 1.00 / 1.00 | 0.000% |  |
+| Serpinski | E | exact | 1.00 / 1.00 / 1.00 | 0.000% | reference: surface samples |
+| Snail | E | near-exact near the surface, conservative farther | 0.63 / 0.69 / 0.33 | 0.009% |  |
+| Snake | C | slightly overestimates | 0.28 / 0.35 / 0.06 | 0.029% | 0.02× the distance beyond radius 20 |
+| Sphere | E | exact | 1.00 / 1.00 / 1.00 | 0.000% |  |
+| Spike | C | near-exact near the surface, conservative farther | 0.82 / 0.72 / 0.45 | 0.002% |  |
+| Tardigrade | C | conservative | 0.24 / 0.15 / 0.00 | 0.000% | jumps at 4.62% of point pairs |
+| Teapot | E | conservative | 0.02 / 0.01 / 0.00 | 0.000% |  |
+| Temple | C | conservative | 0.00 / 0.01 / 0.00 | 0.003% | jumps at 0.14% of point pairs |
+| Tetrahedron | E | exact near the surface, conservative farther | 0.95 / 0.78 / 0.38 | 0.000% |  |
+| TieFighter | E | near-exact near the surface, conservative farther | 0.66 / 0.67 / 0.37 | 0.002% |  |
+| Torus | E | exact | 1.00 / 1.00 / 1.00 | 0.000% |  |
+| Tree | C | conservative | 0.08 / 0.13 / 0.01 | 0.010% | jumps at 0.57% of point pairs |
+| Trefoil | C | conservative | 0.00 / 0.00 / 0.00 | 0.000% | 0.16× the distance beyond radius 20 |
+| Triangle | E | exact | 1.00 / 1.00 / 1.00 | 0.000% | reference: surface samples |
+| Triprismbound | C | exact near the surface, conservative farther | 0.93 / 0.70 / 0.27 | 0.000% |  |
+| UprightPiano | C | conservative | 0.55 / 0.80 / 0.70 | 0.001% | jumps at 1.01% of point pairs |
+| Vase | E | conservative | 0.41 / 0.60 / 0.67 | 0.004% |  |
+
 ## Build Instructions for the Interactive Explorer
 
 ### G3D Innovation Engine
