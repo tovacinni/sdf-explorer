@@ -635,6 +635,7 @@ void App::onSample(RenderDevice* rd) {
     // sample, so the grid is dispatched SAMPLE_ROWS_PER_DISPATCH rows at a
     // time and each slice is waited on before the next one is queued.
     const int SAMPLE_ROWS_PER_DISPATCH = 64;
+    const uint32 randomSeed = uint32(std::random_device()());
     for (int rowOffset = 0; rowOffset < m_sampleDim; rowOffset += SAMPLE_ROWS_PER_DISPATCH) {
         const int rows = min(SAMPLE_ROWS_PER_DISPATCH, m_sampleDim - rowOffset);
         Args args;
@@ -648,6 +649,7 @@ void App::onSample(RenderDevice* rd) {
         args.setUniform("rowOffset", rowOffset);
         args.setUniform("sampleCount", m_sampleSize);
         args.setUniform("gridResolution", gridResolution);
+        args.setUniform("randomSeed", randomSeed);
         args.setMacro("FAST", false);
         args.setComputeGridDim(Vector3int32(iCeil(viewport.width() / blockCols), iCeil(rows / float(blockRows)), 1));
         args.setComputeGroupSize(Vector3int32(blockCols, blockRows, 1));

@@ -17,11 +17,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-#ifndef trace_glsl
-#define trace_glsl
+#ifndef near_glsl
+#define near_glsl
 
 const float NaN = uintBitsToFloat(0x7fc00000);
 
+// A surface point found as in surface.glsl, moved along the SDF gradient by a
+// distance drawn from N(0, 0.005^2) and clamped to [-0.3, 0.3].
 vec4 sdf_sampler(vec2 uv, int size) {
     vec3 rayOrigin = vec3(rand(uv/size).xyz) * 2.0 - 1.0;
     vec3 p;
@@ -30,8 +32,11 @@ vec4 sdf_sampler(vec2 uv, int size) {
     for (int i=0; i<100; ++i){
         vec3 n = gaussian(random_idx).xyz;
         vec3 rayDirection = (1.0 / length(n)) * n;
-        if (intersectSDF(rayOrigin, rayDirection, 20.0, t, p)) {
-            p += clamp(gaussian(uv/size).xyz * 0.005, -0.3, 0.3);
+        if (intersectSDF(rayOrigin, rayDirection, 20.0, t, p) && insideSampleCube(p)) {
+            // rand(random_idx) is a fresh coordinate, so the offset is
+            // independent of the gaussian value that chose the ray direction.
+            float offset = clamp(gaussian(rand(random_idx).xy).x * 0.005, -0.3, 0.3);
+            p += sdf_normal(p).xyz * offset;
             return vec4(p, sdf_bounded(p));
         }
         random_idx = rand(random_idx).xy;
@@ -42,4 +47,3 @@ vec4 sdf_sampler(vec2 uv, int size) {
 }
 
 #endif
-

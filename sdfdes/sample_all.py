@@ -20,6 +20,9 @@
 Runs the explorer binary once per (pattern, SDF) and writes
 <out>/<pattern>/<SDF>.bin (the explorer's output) and <out>/<pattern>/<SDF>.npz
 with arrays `position` (N, 3), `distance` (N, 1) and `gradient` (N, 3).
+The grid pattern also gets `volume` (r, r, r) indexed [x, y, z] and `axis`
+(r,), the coordinate of lattice index i on every axis; the image pattern gets
+`slice` (s, s) indexed [x, y] and `axis`.
 
 The default binary is build/sdf-explorer-egl, which `icompile --egl --opt`
 builds; it renders through EGL on the GPU and needs no display.
@@ -43,6 +46,31 @@ def parse_methods(specs):
         name, count = spec.split(':')
         methods[name] = int(count)
     return methods
+
+
+def lattice_arrays(method, size, dist):
+    """Volume-shaped copies of the grid and image samples, indexed [x, y(, z)].
+
+    grid.glsl writes lattice point (x, y, z) at sample index (z * r + y) * r + x,
+    r the smallest integer with r^3 >= N, at coordinate -1 + 2i/(r-1) on each
+    axis; image.glsl writes pixel (x, y) at index y * s + x, s = ceil(sqrt(N)).
+    Lattice points beyond the N requested are NaN.
+    """
+    if method == 'grid':
+        r = 1
+        while r ** 3 < size:
+            r += 1
+        flat = np.full(r ** 3, np.nan, dtype=np.float32)
+        flat[:size] = dist[:size, 0]
+        return {'volume': flat.reshape(r, r, r).transpose(2, 1, 0),
+                'axis': np.linspace(-1.0, 1.0, r, dtype=np.float32)}
+    if method == 'image':
+        s = int(np.ceil(np.sqrt(size)))
+        flat = np.full(s * s, np.nan, dtype=np.float32)
+        flat[:size] = dist[:size, 0]
+        return {'slice': flat.reshape(s, s).transpose(1, 0),
+                'axis': np.linspace(-1.0, 1.0, s, dtype=np.float32)}
+    return {}
 
 
 def main():
@@ -75,7 +103,8 @@ def main():
             if not bool((pos != 0).any()):
                 raise RuntimeError(f'{bin_path} holds only zeros: the sampling dispatch did not run')
             np.savez(os.path.join(out, method, f'{shape}.npz'),
-                     position=pos.numpy(), distance=dist.numpy(), gradient=normal.numpy())
+                     position=pos.numpy(), distance=dist.numpy(), gradient=normal.numpy(),
+                     **lattice_arrays(method, size, dist.numpy()))
             print(f'{method:22s} {shape:16s} {size}', flush=True)
 
 
