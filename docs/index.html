@@ -277,7 +277,7 @@ both traditional graphics and training neural networks.
                 <span class="material-icons"> code </span> 
                  Code
             </a>
-            <a class="paper-btn" href="https://drive.google.com/file/d/1StTkilQSk83lj60VaqcMHh3GT73CSIKT/view">
+            <a class="paper-btn" href="https://drive.google.com/drive/folders/10DcbQqtVoAv7oLBEdPtr16E5J23jfNKg">
                 <span class="material-icons"> interests </span> 
                  Dataset
             </a>
@@ -299,6 +299,7 @@ both traditional graphics and training neural networks.
         <h2>News</h2>
         <hr>
         <div class="row">
+            <div><span class="material-icons"> event </span> [November 2026] The dataset has been regenerated with all eight samplers from the paper and is available <a href="https://drive.google.com/drive/folders/10DcbQqtVoAv7oLBEdPtr16E5J23jfNKg">here</a>. The explorer now also samples headlessly through EGL.</div>
             <div><span class="material-icons"> event </span> [May 2022] Our i3D talk is available <a href="https://www.youtube.com/watch?v=pgBB-cFZkfE">here</a>!</div>
             <div><span class="material-icons"> event </span> [May 2022] We will be presenting at <a href="https://i3dsymposium.org/2022/">i3D 2022</a>!</div>
             <div><span class="material-icons"> event </span> [April 2022] Our <a href="https://github.com/tovacinni/sdf-explorer">code</a> has been released.</div>
@@ -330,14 +331,17 @@ both traditional graphics and training neural networks.
     <section id="dataset">
         <h2>Dataset</h2>
         <hr>
-        <p>Our dataset can be downloaded from <a href="https://drive.google.com/file/d/1StTkilQSk83lj60VaqcMHh3GT73CSIKT/view">here</a>.
-        This dataset includes 3 sampling distributions (uniformly random, near surface, on surface) of positions with their 
-        corresponding signed distance functions and gradients. We make these available as npz files. For 
-        more information on these npz files, please refer to the README of our <a href="https://github.com/tovacinni/sdf-explorer">code repostiory</a>.
+        <p>Our dataset can be downloaded from <a href="https://drive.google.com/drive/folders/10DcbQqtVoAv7oLBEdPtr16E5J23jfNKg">here</a> (17 GB).
+        It samples all 63 signed distance functions with each of the eight samplers described in the paper:
+        uniformly random (1M points), near surface (2M), on surface (2M), grid (100<sup>3</sup>), jitter (1M),
+        image (a 1000<sup>2</sup> slice at z = 0), Metropolis toward the surface (1M) and Metropolis toward high curvature (1M).
+        Each sampler is one zip of npz files, one per shape, holding the positions with their signed distances and gradients;
+        the grid files also hold the samples as a 100<sup>3</sup> volume, and the image files as a 2D slice.
+        For more information on these npz files, please refer to the README of our <a href="https://github.com/tovacinni/sdf-explorer">code repository</a>.
         </p>
         <img width="100%" src="assets/dataset.jpg">
         <p class="caption">
-            We collect a total of 67 signed distance functions from Shadertoy and other sources.
+            We collect a total of 63 signed distance functions from Shadertoy and other sources.
         </p>
     </section>
 
