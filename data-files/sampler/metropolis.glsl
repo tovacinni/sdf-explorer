@@ -36,7 +36,7 @@ vec4 sdf_sampler(vec2 uv, int size) {
         if (min(1, ratio) < 1.0) {
             p = next;
         }
-        random_idx = rand(random_idx.xy).xyz;
+        random_idx = rand(fract(random_idx.xy + uv / size)).xyz;
     }
     return vec4(p, sdf_bounded(p));
 }

@@ -518,55 +518,41 @@ void App::findmin(RenderDevice* rd, float& minh) {
 #endif
 
 
-const shared_ptr<Texture>& uniformRandom3d() {
-    static shared_ptr<Texture> t;
+/** Fills a dim x dim uniform [0, 1) texture and a dim x dim standard-normal
+    texture from one generator. The sampling grid is also dim x dim, so the
+    texel-centre lookup rand(uv / size) in a sampler reads a different texel
+    for every sample; a texture smaller than the grid would hand several
+    samples the same random value and so the same point. One generator feeds
+    both textures so that rand(c) and gaussian(c) at the same coordinate are
+    independent. */
+static void makeRandomTextures(int dim, shared_ptr<Texture>& uniformTexture, shared_ptr<Texture>& gaussianTexture) {
+    Random rnd(std::random_device()(), false);
 
-    Random rnd;
-    srand((unsigned int)time(nullptr));
-    rnd.reset(rand(), false);
-    const shared_ptr<GLPixelTransferBuffer>& ptb = GLPixelTransferBuffer::create(1024, 1024, ImageFormat::RGB32F());
+    const shared_ptr<GLPixelTransferBuffer>& uniformPTB = GLPixelTransferBuffer::create(dim, dim, ImageFormat::RGB32F());
     {
-        float* ptr = (float*)ptb->mapWrite();
-        for (int i = 0; i < ptb->width() * ptb->height() * 3; ++i) {
-            ptr[i] = float(rnd.uniform(0.0, 1.0)); ++i;
-            ptr[i] = float(rnd.uniform(0.0, 1.0)); ++i;
+        float* ptr = (float*)uniformPTB->mapWrite();
+        for (int i = 0; i < dim * dim * 3; ++i) {
             ptr[i] = float(rnd.uniform(0.0, 1.0));
         }
-        ptr = nullptr;
-        ptb->unmap();
+        uniformPTB->unmap();
     }
-    t = Texture::fromPixelTransferBuffer("uniformRandom3d", ptb, ImageFormat::RGB32F(), Texture::DIM_2D, true);
-    t->visualization.max = 1.0f;
-    t->visualization.min = 0.0f;
-    t->visualization.documentGamma = 2.1f;
+    uniformTexture = Texture::fromPixelTransferBuffer("uniformRandom3d", uniformPTB, ImageFormat::RGB32F(), Texture::DIM_2D, false);
+    uniformTexture->visualization.max = 1.0f;
+    uniformTexture->visualization.min = 0.0f;
+    uniformTexture->visualization.documentGamma = 2.1f;
 
-    return t;
-}
-
-
-const shared_ptr<Texture>& gaussianRandom3d() {
-    static shared_ptr<Texture> t;
-
-    Random rnd;
-    srand((unsigned int)time(nullptr));
-    rnd.reset(rand(), false);
-    const shared_ptr<GLPixelTransferBuffer>& ptb = GLPixelTransferBuffer::create(1024, 1024, ImageFormat::RGB32F());
+    const shared_ptr<GLPixelTransferBuffer>& gaussianPTB = GLPixelTransferBuffer::create(dim, dim, ImageFormat::RGB32F());
     {
-        float* ptr = (float*)ptb->mapWrite();
-        for (int i = 0; i < ptb->width() * ptb->height() * 3; ++i) {
-            ptr[i] = float(rnd.gaussian(0.0, 1.0)); ++i;
-            ptr[i] = float(rnd.gaussian(0.0, 1.0)); ++i;
+        float* ptr = (float*)gaussianPTB->mapWrite();
+        for (int i = 0; i < dim * dim * 3; ++i) {
             ptr[i] = float(rnd.gaussian(0.0, 1.0));
         }
-        ptr = nullptr;
-        ptb->unmap();
+        gaussianPTB->unmap();
     }
-    t = Texture::fromPixelTransferBuffer("uniformGaussian3d", ptb, ImageFormat::RGB32F(), Texture::DIM_2D, true);
-    t->visualization.max = 10.0f;
-    t->visualization.min = -10.0f;
-    t->visualization.documentGamma = 2.1f;
-
-    return t;
+    gaussianTexture = Texture::fromPixelTransferBuffer("uniformGaussian3d", gaussianPTB, ImageFormat::RGB32F(), Texture::DIM_2D, false);
+    gaussianTexture->visualization.max = 10.0f;
+    gaussianTexture->visualization.min = -10.0f;
+    gaussianTexture->visualization.documentGamma = 2.1f;
 }
 
 
@@ -619,9 +605,9 @@ void App::writeBinary(
 
 #ifdef G3D_LINUX
 void App::onSample(RenderDevice* rd) {
-    const shared_ptr<Texture>& uniformSampler = uniformRandom3d(); 
-    const shared_ptr<Texture>& gaussianSampler = gaussianRandom3d(); 
-    //t->generateMipMaps();
+    shared_ptr<Texture> uniformSampler;
+    shared_ptr<Texture> gaussianSampler;
+    makeRandomTextures(m_sampleDim, uniformSampler, gaussianSampler);
     if (isNull(m_distanceSSBO)) {
         allocateSSBO(m_distanceSSBO, m_sampleDim, m_sampleDim, 1, 0);
     }
@@ -634,23 +620,40 @@ void App::onSample(RenderDevice* rd) {
 
     BEGIN_PROFILER_EVENT("SDF Sampling");
     const Rect2D viewport = Rect2D::xywh(0.0f, 0.0f, (float)m_distanceSSBO->width(), (float)m_distanceSSBO->height());
-    {
+    // Smallest lattice resolution whose cube holds every sample; grid.glsl
+    // and jitter.glsl take the first N points of that lattice.
+    int gridResolution = 1;
+    while (gridResolution * gridResolution * gridResolution < m_sampleSize) {
+        ++gridResolution;
+    }
+
+    const int blockCols = 16;
+    const int blockRows = 16;
+    // The driver abandons a compute dispatch that runs for more than a few
+    // seconds and leaves the buffer zeroed without reporting an error. The
+    // metropolis_curvature sampler on a fractal SDF needs about 25 us per
+    // sample, so the grid is dispatched SAMPLE_ROWS_PER_DISPATCH rows at a
+    // time and each slice is waited on before the next one is queued.
+    const int SAMPLE_ROWS_PER_DISPATCH = 64;
+    for (int rowOffset = 0; rowOffset < m_sampleDim; rowOffset += SAMPLE_ROWS_PER_DISPATCH) {
+        const int rows = min(SAMPLE_ROWS_PER_DISPATCH, m_sampleDim - rowOffset);
         Args args;
         args.setRect(viewport);
-
-        const float blockCols = 16.0f;
-        const float blockRows = 16.0f;
-        args.setUniform("uniformRandom3d", uniformSampler, Sampler(WrapMode::TILE, InterpolateMode::NEAREST_MIPMAP));
-        args.setUniform("gaussianRandom3d", gaussianSampler, Sampler(WrapMode::TILE, InterpolateMode::NEAREST_MIPMAP));
+        args.setUniform("uniformRandom3d", uniformSampler, Sampler(WrapMode::TILE, InterpolateMode::NEAREST_NO_MIPMAP));
+        args.setUniform("gaussianRandom3d", gaussianSampler, Sampler(WrapMode::TILE, InterpolateMode::NEAREST_NO_MIPMAP));
         args.setMacro("ACTIVE_SHADER", m_shaderArray[m_activeShader]);
         args.setMacro("ACTIVE_SAMPLER", "sampler/" + m_samplerArray[m_activeSampler]); 
         args.setUniform("modelMatrix", CFrame::fromXYZYPRDegrees(0, 0, 0, 0, 0, 0));
         args.setUniform("modelRadius", m_modelRadius);
+        args.setUniform("rowOffset", rowOffset);
+        args.setUniform("sampleCount", m_sampleSize);
+        args.setUniform("gridResolution", gridResolution);
         args.setMacro("FAST", false);
-        args.setComputeGridDim(Vector3int32(iCeil(viewport.width() / blockCols), iCeil(viewport.height() / blockRows), 1 ));
-        args.setComputeGroupSize(Vector3int32((int)blockCols, (int)blockRows, 1));
+        args.setComputeGridDim(Vector3int32(iCeil(viewport.width() / blockCols), iCeil(rows / float(blockRows)), 1));
+        args.setComputeGroupSize(Vector3int32(blockCols, blockRows, 1));
         debugAssertGLOk();
         LAUNCH_SHADER("App/App_sample.glc", args);
+        glFinish();
     }
     END_PROFILER_EVENT();
     

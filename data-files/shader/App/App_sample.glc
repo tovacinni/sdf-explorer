@@ -24,10 +24,21 @@
 
 #include <g3dmath.glsl>
 
+// Both textures have one texel per sample. Lookups are offset to the texel
+// centre so that rand(uv / size) reads texel uv exactly; a lookup on the
+// texel edge can round into the neighbouring texel and give two samples the
+// same random value.
 uniform sampler2D uniformRandom3d;
-#define rand(coord) texture2D(uniformRandom3d, coord)
+#define rand(coord) texture(uniformRandom3d, (coord) + 0.5 / vec2(textureSize(uniformRandom3d, 0)))
 uniform sampler2D gaussianRandom3d;
-#define gaussian(coord) texture2D(gaussianRandom3d, coord)
+#define gaussian(coord) texture(gaussianRandom3d, (coord) + 0.5 / vec2(textureSize(gaussianRandom3d, 0)))
+
+// First row of the sample grid covered by this dispatch.
+uniform int rowOffset;
+// Number of samples requested on the command line.
+uniform int sampleCount;
+// Smallest lattice resolution r with r^3 >= sampleCount.
+uniform int gridResolution;
 
 #include "App_raycast.glsl"
 
@@ -69,11 +80,12 @@ vec4 sdf_normal(vec3 p) {
 #include ACTIVE_SAMPLER
 
 void main() {
-    if (gl_GlobalInvocationID.x >= g3d_FragCoordExtent.x) {
+    ivec2 pixel = ivec2(gl_GlobalInvocationID.x, int(gl_GlobalInvocationID.y) + rowOffset);
+    if ((pixel.x >= int(g3d_FragCoordExtent.x)) || (pixel.y >= int(g3d_FragCoordExtent.y))) {
         return;
     }
-    int index = (int)gl_GlobalInvocationID.y * (int)g3d_FragCoordExtent.x + (int)gl_GlobalInvocationID.x;
-    vec4 xyzd = sdf_sampler(gl_GlobalInvocationID.xy, (int)g3d_FragCoordExtent.x);
+    int index = pixel.y * int(g3d_FragCoordExtent.x) + pixel.x;
+    vec4 xyzd = sdf_sampler(vec2(pixel), int(g3d_FragCoordExtent.x));
     distance[index] = xyzd;
     normal[index] = sdf_normal(xyzd.xyz);
 }

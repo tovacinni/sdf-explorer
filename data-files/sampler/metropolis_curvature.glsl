@@ -42,41 +42,33 @@ bool raystab(vec3 rayOrigin, vec3 random_idx, out vec3 hitpoint) {
     return false; // If not found, return input
 }
 
+// Step 0 stabs a ray from a random point in the [-1, 1] cube; a sample whose
+// first stab misses the surface is all NaN. Each of the NUM_ITER later steps
+// stabs a ray from a new random origin and moves to its hit point when the
+// hit has a larger absolute mean curvature than the current point. raystab
+// and sdf_curv each appear once so the compiler inlines one copy of the SDF
+// per call; large SDFs exceed the GLSL compiler's limits otherwise.
 vec4 sdf_sampler(vec2 uv, int size) {
+    vec3 random_idx = rand(uv/size).xyz;
+    vec3 p = vec3(NaN, NaN, NaN);
+    float pCurvature = 0.0;
 
-    // Initial point
-    vec3 p = vec3(rand(uv/size).xyz) * 2.0 - 1.0;
-    vec3 random_idx = rand(uv/size).xyz; 
-    if (!raystab(p, random_idx, p)) {
-        p = vec3(NaN, NaN, NaN); 
-        return vec4(p, sdf(p));
-    }
-    random_idx = rand(random_idx.xy).xyz;
-
-    // Start metropolis search
-    for (int i=0; i<NUM_ITER; ++i) {
-
-        // Find next candidate point by intersecting
-        vec3 rayOrigin = random_idx.xyz; // Start from random location
+    for (int i = 0; i <= NUM_ITER; ++i) {
+        vec3 rayOrigin = random_idx * 2.0 - 1.0;
         vec3 next;
-        if (!raystab(rayOrigin, random_idx, next)) {
-            random_idx = rand(random_idx.xy).xyz;
-            continue; // No hit; just go to next metropolis
+        if (raystab(rayOrigin, random_idx, next)) {
+            float nextCurvature = abs(sdf_curv(next));
+            if ((i == 0) || (nextCurvature > pCurvature)) {
+                p = next;
+                pCurvature = nextCurvature;
+            }
+        } else if (i == 0) {
+            return vec4(p, sdf(p));
         }
-
-        // Calculate acceptance probability of new intersection
-        //float ratio = ( abs( sdf( next ) ) + abs( curv( p    ) ) ) /
-        //              ( abs( sdf( p    ) ) + abs( curv( next ) ) );
-        float ratio = abs(sdf_curv(p)) / abs(sdf_curv(next));
-
-        if (min(1, ratio) < 1.0) {
-            p = next;
-        }
-        random_idx = rand(random_idx.xy).xyz;
+        random_idx = rand(fract(random_idx.xy + uv / size)).xyz;
     }
     p += gaussian(random_idx.xy).xyz * 0.01;
     return vec4(p, sdf_bounded(p));
 }
 
 #endif
-
