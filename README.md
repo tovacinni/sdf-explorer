@@ -15,19 +15,37 @@ If you have any feature requests, feel free to submit an issue!
 
 ## Downloading the Dataset
 
-Our dataset is available as `.npz` files for download [here](https://drive.google.com/file/d/1StTkilQSk83lj60VaqcMHh3GT73CSIKT/view?usp=sharing) 
-(4.3 GB). The dataset contains randomly
-sampled point clouds along with their signed distances and gradients.
+Our dataset is available [here](https://drive.google.com/drive/folders/10DcbQqtVoAv7oLBEdPtr16E5J23jfNKg)
+(17 GB). It samples all 63 SDFs with each of the eight samplers in `data-files/sampler`; each sampler
+is one zip, `sdf-explorer-<sampler>.zip`, holding `<sampler>/<SDF>.npz` for every shape:
+
+| Sampler | Points per shape |
+|---|---|
+| `rand` (uniform in the [-1, 1] cube) | 1M |
+| `near` (surface points moved along the gradient by N(0, 0.005²)) | 2M |
+| `surface` (on the zero level set) | 2M |
+| `grid` (100³ lattice over [-1, 1]³) | 1M |
+| `jitter` (the grid lattice, jittered within half a cell) | 1M |
+| `image` (1000² lattice on the z = 0 plane) | 1M |
+| `metropolis` (Metropolis–Hastings toward the surface) | 1M |
+| `metropolis_curvature` (Metropolis–Hastings toward high curvature) | 1M |
+
+The `surface` and `near` samples, and the starting point of `metropolis_curvature`, are NaN where 100
+random rays all missed the shape.
 
 To load the `.npz` files, you can simply do:
 
 ```python
 import numpy as np
 npz_file = np.load("Snail.npz")
-position = npz_file['position']
-distance = npz_file['distance']
-gradient = npz_file['gradient']
+position = npz_file['position']  # (N, 3)
+distance = npz_file['distance']  # (N, 1)
+gradient = npz_file['gradient']  # (N, 3)
 ```
+
+The `grid` files also hold `volume`, the distances as an (r, r, r) array indexed `[x, y, z]`, and
+`axis`, the coordinate of index i on every axis; the `image` files hold `slice`, indexed `[x, y]`, and
+`axis`.
 
 ## Build Instructions for the Interactive Explorer
 
